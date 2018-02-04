@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>IntersectionObserver - Example1</title>
+</head>
+
+<body>
+  <style>
+    #viewport {
+      position: relative;
+      height: 400px;
+      overflow: auto;
+    }
+
+    .item {
+      position: absolute;
+      width: 100%;
+      margin: 0;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .item:nth-child(even) {
+      background-color: #f1f1f1;
+    }
+
+    .sentinel {
+      height: 10px;
+      margin: 0;
+      position: absolute;
+    }
+
+  </style>
+
+  <div id="container">
+    <div id="viewport">
+      <p class="sentinel" id="sentinelTop"></p>
+      <p class="sentinel" id="sentinelBottom"></p>
+    </div>
+
+  </div>
+
+  <script>
+    var count = 20;
+    var index = 0;
+    var rStartIndex = 0;
+    var rEndIndex = 0;
+    var observer = [];
+    var viewport = document.getElementById("viewport");
+    var sentinelTop = document.getElementById('sentinelTop');
+    var sentinelBottom = document.getElementById('sentinelBottom');
+    var prevY = viewport.scrollTop;
+
+    function addItems(entry) {
+      var fragment = document.createDocumentFragment();
+
+      for (let i = index + 1; i <= index + count; ++i) {
+        const item = document.createElement('p');
+
+        item.classList.add('item');
+        item.style.top = (61 * (i - 1)) + "px";
+        item.textContent = `#${i}`;
+        item.setAttribute('data-index', i - 1);
+
+        fragment.appendChild(item);
+      }
+
+      viewport.appendChild(fragment);
+      sentinelTop.style.top = (61 * (index)) + "px";
+      sentinelBottom.style.top = (61 * (index + count)) + "px";
+      index += count;
+
+    }
+
+    function addItemsToTop(entry) {
+      var fragment = document.createDocumentFragment();
+
+      if (rEndIndex <= rStartIndex) return;
+
+      // console.log("add ", rStartIndex, " to ", rEndIndex - 1)
+      for (let i = rStartIndex; i < rEndIndex; i++) {
+        const item = document.createElement('p');
+
+        item.classList.add('item');
+        item.style.top = (61 * (i)) + "px";
+        item.textContent = `#${i+1}`;
+        item.setAttribute('data-index', i);
+
+        fragment.appendChild(item);
+      }
+      viewport.appendChild(fragment);
+      rEndIndex = rStartIndex;
+      rStartIndex = (rEndIndex - 10 > 0) ? rEndIndex - 10 : 0;
+      sentinelTop.style.top = (61 * (rEndIndex)) + "px";
+
+      // console.log("rStartIndex ",rStartIndex, " rEndIndex ", rEndIndex)
+    }
+
+    function removeItems(entry) {
+      var lastIndex = Math.ceil(parseInt(sentinelTop.style.top.replace("px", "")) / (61 * 2));
+      var items = document.getElementsByClassName('item');
+      var count = 10;
+      if (lastIndex > count) rEndIndex = lastIndex - count;
+      while (lastIndex > count) {
+        var item = viewport.querySelector('.item[data-index="' + (lastIndex - count - 1) + '"]');
+
+        if (item) {
+          viewport.removeChild(item);
+        } else {
+          break;
+        }
+
+        lastIndex--;
+        rStartIndex = lastIndex - count;
+
+      }
+      // console.log("remove ", rStartIndex, " to ", rEndIndex);
+      // console.log("rEndIndex after remove", rEndIndex)
+      // console.log("rStartIndex after remove", rStartIndex)
+    }
+
+    observer[0] = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) {} else {
+          addItems(entry);
+          removeItems(entry);
+        }
+
+      });
+    }, {
+      root: viewport
+    });
+
+    observer[1] = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+
+        if (prevY - viewport.scrollTop > 0) {
+          var lastIndex = parseInt(entry.target.style.top.replace("px", "")) / (61 * 2);
+          addItemsToTop(entry, lastIndex);
+        }
+        prevY = viewport.scrollTop;
+
+      });
+    }, {
+      root: viewport,
+    })
+
+    observer[0].observe(sentinelBottom);
+    observer[1].observe(sentinelTop);
+
+    addItems();
+  </script>
+</body>
+
+</html>
