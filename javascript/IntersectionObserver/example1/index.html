@@ -1,9 +1,145 @@
 <!DOCTYPE html>
-
 <html>
-  <head>
-    <title>IntersectionObserver - example1</title>
-  </head>
-  <body>
-  </body>
+
+<head>
+  <title>IntersectionObserver - Example1</title>
+</head>
+
+<body>
+  <style>
+    #root {
+      width: 600px;
+      height: 300px;
+      text-align: center;
+      overflow: auto;
+      margin-top: 50px;
+    }
+
+    #signalContainer {
+      position: fixed;
+      top: 4px;
+      width: 600px;
+      text-align: center;
+    }
+
+    #targetContainer {
+      height: 1000px;
+      position: relative;
+    }
+
+    .signal {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border-radius: 50px;
+      color: #fff;
+      background-color: #000;
+      line-height: 40px;
+      text-align: center;
+      transition: background-color .5s
+    }
+
+    .signal.active {
+      background-color: #f00;
+    }
+
+    .target {
+      display: inline-block;
+      position: relative;
+      top: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: #ff9d9d;
+      font-size: 20px;
+    }
+
+    .target>span {
+      line-height: 50px;
+    }
+
+    .target>span:first-child {
+      font-weight: bold;
+    }
+  </style>
+  <div id="signalContainer">
+    <div id="signalForTarget1" class="signal">
+      1
+    </div>
+    <div id="signalForTarget2" class="signal">
+      2
+    </div>
+    <div id="signalForTarget3" class="signal">
+      3
+    </div>
+    <div id="signalForTarget4" class="signal">
+      4
+    </div>
+  </div>
+  <div id="root">
+    <div id="targetContainer">
+      <div id="target1" class="target">
+        <span>#1</span>
+        <br />
+        <span>rm:0</span>
+      </div>
+      <div id="target2" class="target">
+        <span>#2</span>
+        <br />
+        <span>rm:50px</span>
+      </div>
+      <div id="target3" class="target">
+        <span>#3</span>
+        <br />
+        <span>rm:-50px</span>
+      </div>
+      <div id="target4" class="target">
+        <span>#4</span>
+        <br />
+        <span>th:0.5</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var observer = [];
+
+    function callback(entries, observer) {
+      var targetId = entries[0].target.id;
+      var signalElement = document.querySelector('#signalFor' + targetId[0].toUpperCase() + targetId.substring(1));
+
+      if (entries[0].isIntersecting) {
+        signalElement.classList.add('active');
+        if (targetId === "target4") {
+          if (entries[0].intersectionRatio < 0.5 && signalElement.classList.contains('active'))
+            signalElement.classList.remove('active');
+        }
+      } else if (signalElement.classList.contains('active')) {
+        signalElement.classList.remove('active');
+      }
+    }
+
+    observer[0] = new IntersectionObserver(callback, {
+      root: document.querySelector('#root'),
+      rootMargin: '0px',
+    });
+    observer[1] = new IntersectionObserver(callback, {
+      root: document.querySelector('#root'),
+      rootMargin: '50px',
+    });
+    observer[2] = new IntersectionObserver(callback, {
+      root: document.querySelector('#root'),
+      rootMargin: '-50px',
+    });
+    observer[3] = new IntersectionObserver(callback, {
+      root: document.querySelector('#root'),
+      threshold: '0.5',
+    });
+
+    var targets = document.querySelectorAll(".target");
+    targets.forEach(function(e, i) {
+      observer[i].observe(e);
+    });
+  </script>
+</body>
+
 </html>
