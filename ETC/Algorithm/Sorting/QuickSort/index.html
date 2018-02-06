@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>QuickSort</title>
+</head>
+
+<body>
+  <strong>Input your un-ordered Array ex) 1,5,3,6,7</strong>
+  <br />
+  <input id="inputArray" />
+  <br />
+  <button onclick="startSort()">QuickSort</button>
+  <br />
+  <strong>Your ordered Array is</strong>
+  <div id="result">
+
+  </div>
+  <script>
+    let array = [];
+
+    function startSort() {
+      array = [];
+      var arrayValue = document.getElementById("inputArray").value;
+      var tempArray = arrayValue.split(",");
+
+      tempArray.forEach(function(val){
+        if(!isNaN(parseFloat(val))) array.push(parseFloat(val));
+      });
+
+      quickSort(0, array.length-1, array)
+      document.getElementById("result").innerHTML = array;
+    }
+
+    function quickSort(left, right, arr) {
+      let pivot = left;
+      let j = pivot;
+      let i = left + 1;
+      var tmp;
+
+      if (left < right) {
+        for (; i <= right; i++) {
+          if (arr[i] < arr[pivot]) {
+            j++;
+            //swap i<->j
+            tmp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = tmp;
+          }
+        }
+        //swap pivot<->j
+        tmp = arr[pivot];
+        arr[pivot] = arr[j];
+        arr[j] = tmp;
+        pivot = j;
+        quickSort(left, pivot - 1, arr);
+        quickSort(pivot + 1, right, arr);
+      }
+    }
+
+  </script>
+</body>
+
+</html>
