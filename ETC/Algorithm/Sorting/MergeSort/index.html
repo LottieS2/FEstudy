@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>QuickSort</title>
+</head>
+
+<body>
+  <strong>Input your un-ordered Array ex) 1,5,3,6,7</strong>
+  <br />
+  <input id="inputArray" />
+  <br />
+  <button onclick="startSort()">MergeSort</button>
+  <br />
+  <strong>Your ordered Array is</strong>
+  <div id="result">
+
+  </div>
+  <script>
+    let array = [];
+
+    function startSort() {
+      array = [];
+      var arrayValue = document.getElementById("inputArray").value;
+      var tempArray = arrayValue.split(",");
+
+      tempArray.forEach(function(val){
+        if(!isNaN(parseFloat(val))) array.push(parseFloat(val));
+      });
+
+      array = mergeSort(array)
+
+      document.getElementById("result").innerHTML = array;
+    }
+
+    function mergeSort(arr) {
+      if(arr.length === 0) return;
+      if(arr.length === 1) {
+        return arr;
+      }
+
+      const mid = Math.floor(arr.length/2);
+      const left = arr.slice(0, mid);
+      const right = arr.slice(mid);
+
+      return merge(mergeSort(left), mergeSort(right));
+
+    }
+
+    function merge (left, right) {
+      let result = []
+      let indexLeft = 0
+      let indexRight = 0
+
+      while(indexLeft<left.length && indexRight <right.length){
+        if(left[indexLeft] < right[indexRight]) {
+          result.push(left[indexLeft]);
+          indexLeft++;
+        }
+        else {
+          result.push(right[indexRight]);
+          indexRight++;
+        }
+      }
+      return result.concat(left.slice(indexLeft)).concat(right.slice(indexRight))
+    }
+
+  </script>
+</body>
+
+</html>
